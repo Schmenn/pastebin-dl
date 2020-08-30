@@ -7,6 +7,7 @@ import(
 	"log"
 	"github.com/PuerkitoBio/goquery"
 	"os"
+	"strings"
 )
 
 func main(){
@@ -30,15 +31,22 @@ func main(){
 		os.Exit(1)
 	}
 
-	/*var output string
-
+	var output string
+	
+Loop:
 	for i, a := range os.Args{
 		if a == "-o" {
+			//fmt.Println(os.Args[i+1])
 			output = os.Args[i+1]
+			break Loop
 		} else {
-			output = u.
+			output = strings.ReplaceAll(u.EscapedPath(), "/", "")
 		}
-	}*/
+	}
+
+
+	//fmt.Println(u.EscapedPath())
+	//os.Exit(0)
 
 	res, err := http.Get(u.String())
 	if err != nil {
@@ -47,7 +55,7 @@ func main(){
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Fatalln("status code error: " + string(res.StatusCode) + string(res.Status))
+		log.Fatalln("status code error: " + fmt.Sprint(res.StatusCode) + fmt.Sprint(res.Status))
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -62,6 +70,12 @@ func main(){
 	})
 
 	fmt.Println(text)
+	f, err := os.Create(output)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	f.Write([]byte(text))
+	f.Close()
 }
 
 
